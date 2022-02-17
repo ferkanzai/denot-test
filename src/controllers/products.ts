@@ -26,6 +26,8 @@ const products: Product[] = [
 // @route   GET /api/v1/products
 
 const getProducts = ({ response }: Context) => {
+  console.log(Deno.env.get("TEST"));
+
   response.body = {
     success: true,
     data: products,
