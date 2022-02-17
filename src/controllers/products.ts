@@ -1,4 +1,4 @@
-import { Context, helpers } from "https://deno.land/x/oak/mod.ts";
+import { Context, helpers } from "https://deno.land/x/oak@v10.2.1/mod.ts";
 import { Product } from "../types.ts";
 
 const products: Product[] = [
