@@ -14,30 +14,34 @@ const db = new MongoClient();
 
 try {
   if (env.production) {
-    await db.connect({
-      db: env.mongoDbName as string,
-      tls: true,
-      servers: [
-        {
-          host: "users-shard-00-01.avmtj.mongodb.net",
-          port: 27017,
+    await db
+      .connect({
+        db: env.mongoDbName as string,
+        tls: true,
+        servers: [
+          {
+            host: "users-shard-00-01.avmtj.mongodb.net",
+            port: 27017,
+          },
+          {
+            host: "users-shard-00-00.avmtj.mongodb.net",
+            port: 27017,
+          },
+          {
+            host: "users-shard-00-02.avmtj.mongodb.net",
+            port: 27017,
+          },
+        ],
+        credential: {
+          db: env.mongoDbName,
+          mechanism: "SCRAM-SHA-1",
+          password: env.mongoDbPassword,
+          username: env.mongoDbUser,
         },
-        {
-          host: "users-shard-00-00.avmtj.mongodb.net",
-          port: 27017,
-        },
-        {
-          host: "users-shard-00-02.avmtj.mongodb.net",
-          port: 27017,
-        },
-      ],
-      credential: {
-        db: env.mongoDbName,
-        mechanism: "SCRAM-SHA-1",
-        password: env.mongoDbPassword,
-        username: env.mongoDbUser,
-      },
-    });
+      })
+      .then(() => {
+        console.log("Connected to MongoDB");
+      });
   } else {
     await db
       .connect(`mongodb://${env.mongoDbHost}:${env.mongoDbPort}`)
