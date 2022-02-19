@@ -2,7 +2,7 @@ import { Context, hash, verify } from "../deps.ts";
 import { usersCollection } from "../db/db.ts";
 import { generateAccessToken } from "../middlewares/authMiddlewares.ts";
 
-export const login = async (context: Context) => {
+export const signIn = async (context: Context) => {
   const { request, response } = context;
 
   const { email, password } = await request.body().value;

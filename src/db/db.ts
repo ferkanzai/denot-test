@@ -12,8 +12,6 @@ export interface User {
 
 const db = new MongoClient();
 
-console.log(env);
-
 try {
   if (env.production) {
     await db.connect({

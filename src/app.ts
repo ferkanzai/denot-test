@@ -57,11 +57,24 @@ export const configureApp = (app: Application): Application => {
     } catch (error) {
       console.log(error);
 
-      response.status = error.status || 500;
-      response.body = {
-        success: false,
-        message: error.message,
-      };
+      if (
+        error.message ===
+          "The jwt's signature does not match the verification signature." ||
+        error.message === "jwt expired" ||
+        error.message === "The serialization of the jwt is invalid."
+      ) {
+        response.status = 401;
+        response.body = {
+          success: false,
+          message: "Unauthorized",
+        };
+      } else {
+        response.status = error.status || 500;
+        response.body = {
+          success: false,
+          message: error.message,
+        };
+      }
     }
   });
 
