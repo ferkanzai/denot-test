@@ -21,14 +21,21 @@ try {
       tls: true,
       servers: [
         {
-          host: env.mongoDbHost as string,
+          host: 'users-shard-00-01.avmtj.mongodb.net', // e.g. <name-of-cluster>-00-00.fbnrc.mongodb.net
           port: 27017,
         },
+        {
+          host: 'users-shard-00-00.avmtj.mongodb.net', // e.g. <name-of-cluster>-00-01.fbnrc.mongodb.net
+          port: 27017,
+        },
+        {
+          host: 'users-shard-00-02.avmtj.mongodb.net', // e.g. <name-of-cluster>-00-02.fbnrc.mongodb.net
+          port: 27017,
+        }
       ],
       credential: {
         username: env.mongoDbUser,
         password: env.mongoDbPassword,
-        db: env.mongoDbName as string,
         mechanism: "SCRAM-SHA-1",
       },
     });
