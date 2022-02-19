@@ -12,6 +12,8 @@ export interface User {
 
 const db = new MongoClient();
 
+console.log(env);
+
 try {
   if (env.production) {
     await db.connect({
@@ -39,7 +41,6 @@ try {
   }
 } catch (error) {
   console.log(error);
-  Deno.exit();
 }
 
 const authDb = db.database(env.mongoDbName);
