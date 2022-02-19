@@ -77,7 +77,7 @@ export const singUp = async (context: Context) => {
 export const test = (context: Context) => {
   context.response.body = {
     success: true,
-    token: context.state.token,
+    userId: context.state.id,
     message: "test",
   };
 };
