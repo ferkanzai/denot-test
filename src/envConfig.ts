@@ -14,4 +14,5 @@ export default {
   mongoDbName: Deno.env.get("MONGO_DB_NAME"),
   port: Deno.env.get("PORT"),
   accessTokenSecret: Deno.env.get("ACCESS_TOKEN_SECRET"),
+  production: production === "true",
 };

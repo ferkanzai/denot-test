@@ -11,14 +11,32 @@ export interface User {
 }
 
 const db = new MongoClient();
-const mongoDbUri = Deno.env.get("MONGO_DB_URI");
 
 try {
-  await db
-    .connect(mongoDbUri || `mongodb://${env.mongoDbHost}:${env.mongoDbPort}`)
-    .then(() => {
-      console.log("Connected to MongoDB");
+  if (env.production) {
+    await db.connect({
+      db: env.mongoDbName as string,
+      tls: true,
+      servers: [
+        {
+          host: env.mongoDbHost as string,
+          port: 27017,
+        },
+      ],
+      credential: {
+        username: env.mongoDbUser,
+        password: env.mongoDbPassword,
+        db: env.mongoDbName as string,
+        mechanism: "SCRAM-SHA-1",
+      },
     });
+  } else {
+    await db
+      .connect(`mongodb://${env.mongoDbHost}:${env.mongoDbPort}`)
+      .then(() => {
+        console.log("Connected to MongoDB");
+      });
+  }
 } catch (error) {
   console.log(error);
   Deno.exit();
@@ -27,4 +45,4 @@ try {
 const authDb = db.database(env.mongoDbName);
 const usersCollection = authDb.collection<User>("users");
 
-export { authDb, usersCollection };
+export { db, usersCollection };
