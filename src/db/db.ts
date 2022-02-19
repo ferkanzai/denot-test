@@ -52,7 +52,7 @@ try {
         },
       })
       .then(() => {
-        console.log("Connected to MongoDB");
+        console.log(`Connected to MongoDB at ${mongoDbHost}:${mongoDbPort}`);
       });
   } else {
     await db.connect(`mongodb://${mongoDbHost}:${mongoDbPort}`).then(() => {
