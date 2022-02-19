@@ -1,16 +1,22 @@
-import { Application } from "https://deno.land/x/oak@v10.2.1/mod.ts";
-import { dotEnvConfig } from "./deps.ts";
-import router from "./routes.ts";
+import { Application } from "./deps.ts";
+import router from "./routes/routes.ts";
+import { configureApp } from "./app.ts";
+import envVars from "./envConfig.ts";
 
-const production = Deno.env.get("PRODUCTION");
-
-if (production !== "true") {
-  dotEnvConfig({ export: true });
-}
+const { port } = envVars;
 
 const app = new Application();
 
+configureApp(app);
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-await app.listen({ port: 8000 });
+app.addEventListener("listen", ({ hostname, port, secure }) =>
+  console.log(
+    `Listening on ${secure ? "https://" : "http://"}${
+      hostname === "0.0.0.0" ? "localhost" : hostname
+    }:${port}`
+  )
+);
+
+await app.listen({ port: Number(port) || 8000 });

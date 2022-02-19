@@ -1,4 +1,4 @@
-import { Context, helpers } from "https://deno.land/x/oak@v10.2.1/mod.ts";
+import { Context, helpers } from "../deps.ts";
 import { Product } from "../types.ts";
 
 const products: Product[] = [
@@ -26,8 +26,6 @@ const products: Product[] = [
 // @route   GET /api/v1/products
 
 const getProducts = ({ response }: Context) => {
-  console.log(Deno.env.get("TEST"));
-
   response.body = {
     success: true,
     data: products,
@@ -45,13 +43,8 @@ const getProductById = (context: Context) => {
     ({ id }) => id === productId
   )[0];
 
-  const error = {
-    success: false,
-    message: `Product with id ${productId} not found`,
-  };
-
   if (!product) {
-    context.throw(404, JSON.stringify(error, null, 2));
+    context.throw(404, `Product with id ${productId} was not found`);
   }
 
   response.body = {
@@ -65,19 +58,18 @@ const getProductById = (context: Context) => {
 
 const addProduct = async (context: Context) => {
   const { request } = context;
-  const body = request.body();
+  // console.log(await request.body().value);
+  const value = await request.body({ type: "json" }).value;
+  // console.log(body);
+  // const value = await body.value;
+  console.log(value);
 
-  const error = {
-    success: false,
-    message: `Body cannot be empty`,
-  };
-
-  if (!request.hasBody) {
-    context.throw(404, JSON.stringify(error, null, 2));
+  if (!request.hasBody || !value) {
+    context.throw(400, `Body cannot be empty`);
   }
 
-  const product = JSON.parse(await body.value) as Product;
-  console.log(product);
+  const product = value;
+  context.response.body = product;
 };
 
-export { addProduct, getProducts, getProductById };
+export { addProduct, getProductById, getProducts };
