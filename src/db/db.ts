@@ -2,6 +2,9 @@ import { MongoClient } from "../deps.ts";
 import env from "../envConfig.ts";
 
 const {
+  mongoDbCluster00,
+  mongoDbCluster01,
+  mongoDbCluster02,
   mongoDbHost,
   mongoDbName,
   mongoDbPassword,
@@ -29,16 +32,16 @@ try {
         tls: true,
         servers: [
           {
-            host: "users-shard-00-01.avmtj.mongodb.net",
-            port: 27017,
+            host: mongoDbCluster01 as string,
+            port: Number(mongoDbPort),
           },
           {
-            host: "users-shard-00-00.avmtj.mongodb.net",
-            port: 27017,
+            host: mongoDbCluster00 as string,
+            port: Number(mongoDbPort),
           },
           {
-            host: "users-shard-00-02.avmtj.mongodb.net",
-            port: 27017,
+            host: mongoDbCluster02 as string,
+            port: Number(mongoDbPort),
           },
         ],
         credential: {
