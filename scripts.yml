@@ -1,0 +1,9 @@
+allow:
+  - net
+  - read
+  - env
+
+scripts:
+  start:
+    cmd: src/server.ts
+  dev: denon run --allow-net --allow-read --allow-env src/server.ts
