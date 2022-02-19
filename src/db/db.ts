@@ -1,6 +1,15 @@
 import { MongoClient } from "../deps.ts";
 import env from "../envConfig.ts";
 
+const {
+  mongoDbHost,
+  mongoDbName,
+  mongoDbPassword,
+  mongoDbPort,
+  mongoDbUser,
+  production,
+} = env;
+
 export interface User {
   _id: string;
   email: string;
@@ -13,10 +22,10 @@ export interface User {
 const db = new MongoClient();
 
 try {
-  if (env.production) {
+  if (production) {
     await db
       .connect({
-        db: env.mongoDbName as string,
+        db: mongoDbName as string,
         tls: true,
         servers: [
           {
@@ -33,27 +42,25 @@ try {
           },
         ],
         credential: {
-          db: env.mongoDbName,
+          db: mongoDbName,
           mechanism: "SCRAM-SHA-1",
-          password: env.mongoDbPassword,
-          username: env.mongoDbUser,
+          password: mongoDbPassword,
+          username: mongoDbUser,
         },
       })
       .then(() => {
         console.log("Connected to MongoDB");
       });
   } else {
-    await db
-      .connect(`mongodb://${env.mongoDbHost}:${env.mongoDbPort}`)
-      .then(() => {
-        console.log("Connected to MongoDB");
-      });
+    await db.connect(`mongodb://${mongoDbHost}:${mongoDbPort}`).then(() => {
+      console.log(`Connected to MongoDB at ${mongoDbHost}:${mongoDbPort}`);
+    });
   }
 } catch (error) {
   console.log(error);
 }
 
-const authDb = db.database(env.mongoDbName);
+const authDb = db.database(mongoDbName);
 const usersCollection = authDb.collection<User>("users");
 
 export { db, usersCollection };
