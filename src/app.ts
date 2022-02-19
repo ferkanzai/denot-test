@@ -1,4 +1,5 @@
 import { Application, bold, green, red, yellow } from "./deps.ts";
+import { errorMiddleware } from "./middlewares/errorMiddleware.ts"
 
 const visualResponseTime = (rt: string): string => {
   const rtNumber = Number(rt.split("ms")[0]);
@@ -45,38 +46,7 @@ export const configureApp = (app: Application): Application => {
     ctx.response.headers.set("X-Response-Time", `${ms}ms`);
   });
 
-  app.use(async (ctx, next) => {
-    const { response } = ctx;
-
-    try {
-      await next();
-
-      if (ctx.response.status === 404) {
-        ctx.throw(404, "Not Found");
-      }
-    } catch (error) {
-      console.log(error);
-
-      if (
-        error.message ===
-          "The jwt's signature does not match the verification signature." ||
-        error.message === "jwt expired" ||
-        error.message === "The serialization of the jwt is invalid."
-      ) {
-        response.status = 401;
-        response.body = {
-          success: false,
-          message: "Unauthorized",
-        };
-      } else {
-        response.status = error.status || 500;
-        response.body = {
-          success: false,
-          message: error.message,
-        };
-      }
-    }
-  });
+  app.use(errorMiddleware);
 
   return app;
 };
