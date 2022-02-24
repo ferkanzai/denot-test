@@ -3,6 +3,8 @@ import { errorMiddleware } from "./middlewares/errorMiddleware.ts";
 import router from "./routes/routes.ts";
 
 const visualResponseTime = (rt: string): string => {
+  console.log(rt);
+
   const rtNumber = Number(rt.split("ms")[0]);
   const isSlow = rtNumber >= 200;
 
@@ -15,16 +17,10 @@ const statusColor = (status: number): string => {
 };
 
 export const configureApp = (app: Application): Application => {
-  // Timing
-  app.use(async (ctx, next) => {
-    const start = Date.now();
-    const ms = Date.now() - start;
-    ctx.response.headers.set("X-Response-Time", `${ms}ms`);
-    await next();
-  });
-
   // Logger
   app.use(async (ctx, next) => {
+    await next();
+
     const responseTime = ctx.response.headers.get("X-Response-Time");
     ctx.response.headers.set("Content-Type", "application/json");
     const status = ctx.response.status;
@@ -44,8 +40,14 @@ export const configureApp = (app: Application): Application => {
         responseTime as string
       )} - status: ${statusColor(status)}`
     );
+  });
 
+  // Timing
+  app.use(async (ctx, next) => {
     await next();
+    const start = Date.now();
+    const ms = Date.now() - start;
+    ctx.response.headers.set("X-Response-Time", `${ms}ms`);
   });
 
   app.use(errorMiddleware);
