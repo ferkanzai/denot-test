@@ -1,5 +1,4 @@
 import { Application } from "./deps.ts";
-import router from "./routes/routes.ts";
 import { configureApp } from "./app.ts";
 import envVars from "./envConfig.ts";
 
@@ -8,8 +7,6 @@ const { port } = envVars;
 const app = new Application();
 
 configureApp(app);
-app.use(router.routes());
-app.use(router.allowedMethods());
 
 app.addEventListener("listen", ({ hostname, port, secure }) =>
   console.log(
@@ -18,5 +15,9 @@ app.addEventListener("listen", ({ hostname, port, secure }) =>
     }:${port}`
   )
 );
+
+app.addEventListener("error", (event) => {
+  console.log(event);
+});
 
 await app.listen({ port: Number(port) || 8000 });

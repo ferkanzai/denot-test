@@ -35,15 +35,19 @@ export const signIn = async (context: Context) => {
 export const singUp = async (context: Context) => {
   const { request, response } = context;
 
+  if (!request.hasBody) {
+    context.throw(400, "Request body cannot be empty");
+  }
+
   const { email, password, name, surname } = await request.body().value;
 
   if (!email || !password || !name) {
     context.throw(400, "Email, password and name are required");
   }
 
-  const emailExists = await usersCollection.findOne({ email });
+  const userExists = await usersCollection.findOne({ email });
 
-  if (emailExists) {
+  if (userExists) {
     context.throw(403, "Email already exists");
   }
 
@@ -60,7 +64,7 @@ export const singUp = async (context: Context) => {
     await usersCollection.insertOne(newUser);
 
     response.status = 201;
-    response.body = {
+    response.body = JSON.stringify({
       success: true,
       data: {
         email: newUser.email,
@@ -68,7 +72,9 @@ export const singUp = async (context: Context) => {
         surname: newUser.surname,
       },
       token: `Bearer ${token}`,
-    };
+    });
+
+    return;
   } catch (error) {
     context.throw(500, error);
   }
@@ -80,4 +86,6 @@ export const test = (context: Context) => {
     userId: context.state.id,
     message: "test",
   };
+
+  return;
 };

@@ -8,15 +8,13 @@ export const getAllUsers = async (context: Context) => {
     .toArray();
 
   if (!users) {
-    response.body = {
-      success: false,
-      message: "No users found",
-    };
-    response.status = 404;
-  } else {
-    response.body = {
-      success: true,
-      data: users,
-    };
+    context.throw(404, "No users found");
   }
+
+  response.body = {
+    success: true,
+    data: users,
+  };
+
+  return;
 };

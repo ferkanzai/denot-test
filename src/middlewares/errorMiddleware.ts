@@ -24,12 +24,16 @@ const errorMiddleware = async (ctx: Context, next: () => Promise<unknown>) => {
         success: false,
         message: "Unauthorized",
       };
+
+      return;
     } else {
       response.status = error.status || 500;
       response.body = {
         success: false,
         message: error.message,
       };
+
+      return;
     }
   }
 };

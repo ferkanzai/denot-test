@@ -30,6 +30,8 @@ const getProducts = ({ response }: Context) => {
     success: true,
     data: products,
   };
+
+  return;
 };
 
 // @desc    Get a single product
@@ -51,6 +53,8 @@ const getProductById = (context: Context) => {
     success: true,
     data: product,
   };
+
+  return;
 };
 
 // @desc    Add product
@@ -70,6 +74,8 @@ const addProduct = async (context: Context) => {
 
   const product = value;
   context.response.body = product;
+
+  return;
 };
 
 export { addProduct, getProductById, getProducts };
