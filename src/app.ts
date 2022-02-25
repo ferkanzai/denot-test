@@ -3,8 +3,6 @@ import { errorMiddleware } from "./middlewares/errorMiddleware.ts";
 import router from "./routes/routes.ts";
 
 const visualResponseTime = (rt: string): string => {
-  console.log(rt);
-
   const rtNumber = Number(rt.split("ms")[0]);
   const isSlow = rtNumber >= 200;
 
@@ -22,7 +20,6 @@ export const configureApp = (app: Application): Application => {
     await next();
 
     const responseTime = ctx.response.headers.get("X-Response-Time");
-    ctx.response.headers.set("Content-Type", "application/json");
     const status = ctx.response.status;
     const responseDate = new Date().toLocaleDateString("es", {
       day: "2-digit",
@@ -44,8 +41,8 @@ export const configureApp = (app: Application): Application => {
 
   // Timing
   app.use(async (ctx, next) => {
-    await next();
     const start = Date.now();
+    await next();
     const ms = Date.now() - start;
     ctx.response.headers.set("X-Response-Time", `${ms}ms`);
   });
@@ -59,6 +56,10 @@ export const configureApp = (app: Application): Application => {
   );
   app.use(router.allowedMethods());
   app.use(router.routes());
+
+  app.use((ctx) => {
+    ctx.throw(404, "Not found");
+  });
 
   return app;
 };

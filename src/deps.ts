@@ -6,6 +6,7 @@ export {
   helpers,
   Router,
 } from "https://deno.land/x/oak@v10.2.1/mod.ts";
+export type { Middleware } from "https://deno.land/x/oak@v10.2.1/mod.ts";
 
 export {
   bold,

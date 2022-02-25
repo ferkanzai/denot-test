@@ -1,6 +1,7 @@
-import { Context, hash, verify } from "../deps.ts";
+import { Context, hash, verify, Payload } from "../deps.ts";
 import { usersCollection } from "../db/db.ts";
 import { generateAccessToken } from "../middlewares/authMiddlewares.ts";
+import { User } from "../types.ts";
 
 export const signIn = async (context: Context) => {
   const { request, response } = context;
@@ -13,9 +14,11 @@ export const signIn = async (context: Context) => {
 
   const foundUser = await usersCollection.findOne({ email });
   const user = {
-    id: foundUser?._id,
     email: foundUser?.email,
+    id: foundUser?._id,
     name: foundUser?.name,
+    roles: foundUser?.roles,
+    surname: foundUser?.surname,
   };
   const isPasswordValid = verify(password, foundUser?.password as string);
 
@@ -23,7 +26,13 @@ export const signIn = async (context: Context) => {
     context.throw(403, "Bad credentials");
   }
 
-  const token = await generateAccessToken(user);
+  const payload: Payload = {
+    aud: user.id,
+    name: `${user.name} ${user.surname}`,
+    roles: user.roles,
+  }
+
+  const token = await generateAccessToken(payload);
 
   response.body = {
     success: true,
@@ -41,8 +50,8 @@ export const singUp = async (context: Context) => {
 
   const { email, password, name, surname } = await request.body().value;
 
-  if (!email || !password || !name) {
-    context.throw(400, "Email, password and name are required");
+  if (!email || !password || !name || !surname) {
+    context.throw(400, "Email, password, name and surname are required");
   }
 
   const userExists = await usersCollection.findOne({ email });
@@ -51,22 +60,31 @@ export const singUp = async (context: Context) => {
     context.throw(403, "Email already exists");
   }
 
-  const newUser = {
+  const newUser: User = {
     email,
-    password: await hash(password),
     name,
+    password: await hash(password),
+    roles: ["user"],
     surname,
   };
 
   try {
-    const token = await generateAccessToken(newUser);
+    const _id = await usersCollection.insertOne(newUser);
+    console.log(_id);
 
-    await usersCollection.insertOne(newUser);
+    const payload: Payload = {
+      aud: _id as string,
+      name: `${newUser.name} ${newUser.surname}`,
+      roles: newUser.roles,
+    };
+
+    const token = await generateAccessToken(payload);
 
     response.status = 201;
     response.body = JSON.stringify({
       success: true,
       data: {
+        id: _id,
         email: newUser.email,
         name: newUser.name,
         surname: newUser.surname,

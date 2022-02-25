@@ -5,12 +5,9 @@ import {
   jwtVerify,
   Payload,
 } from "../deps.ts";
-import { User } from "../db/db.ts";
 import env from "../envConfig.ts";
 
 const secretKey = env.accessTokenSecret || "secret";
-
-type myPayload = Payload | User;
 
 export const authenticateToken = async (
   context: Context,
@@ -31,14 +28,15 @@ export const authenticateToken = async (
     context.throw(401, "Unauthorized");
   }
 
-  context.state.id = payload.id;
+  context.state.id = payload.aud;
+  context.state.roles = payload.roles;
 
   await next();
 };
 
-export const generateAccessToken = async (payload: myPayload) =>
+export const generateAccessToken = async (payload: Payload) =>
   await create(
     { alg: "HS256", typ: "JWT" },
-    { ...payload, exp: getNumericDate(7200) },
+    { ...payload, exp: getNumericDate(7200), iss: "api.fercamona.com" },
     secretKey
   );

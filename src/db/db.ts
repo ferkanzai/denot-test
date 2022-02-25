@@ -1,4 +1,5 @@
 import { MongoClient } from "../deps.ts";
+import { User } from "../types.ts";
 import env from "../envConfig.ts";
 
 const {
@@ -12,15 +13,6 @@ const {
   mongoDbUser,
   production,
 } = env;
-
-export interface User {
-  _id: string;
-  email: string;
-  name: string;
-  password: string;
-  roles?: string[];
-  surname: string;
-}
 
 const db = new MongoClient();
 
